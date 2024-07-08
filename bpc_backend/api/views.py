@@ -1,15 +1,18 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from .serializers import user_data_serializer,user_serializer,login_serializer,IdeasSerializer,ContractSerializer,contarctuser,SkillSerializer,TrackingSerializer,PfpSerializer
+from .serializers import user_data_serializer, user_serializer, login_serializer, IdeasSerializer, ContractSerializer, \
+    contarctuser, SkillSerializer, TrackingSerializer, PfpSerializer
 from django.contrib.auth.hashers import make_password
 from rest_framework.response import Response
-from django.contrib.auth.models import User,Group
+from django.contrib.auth.models import User, Group
 from django.core.mail import send_mail
 from django.conf import settings
 from rest_framework import status
 from django.contrib.auth import authenticate
-from .models import user_data,ideas,skill,contract,ContractUser,tracking,pfp
+from .models import user_data, ideas, skill, contract, ContractUser, tracking, pfp
+
+
 # Create your views here.
 
 @api_view(['POST'])
@@ -23,7 +26,7 @@ def signup(request):
         print('**************************')
         print('**************************')
         print('**************************')
- 
+
         user_data_serializer_instance = user_data_serializer(data=data)
         user_serializer_instance = user_serializer(data=data)
 
@@ -32,7 +35,9 @@ def signup(request):
             data['password'] = e_pass
             user_serializer_instance = user_serializer(data=data)
         else:
-            return Response({"errors": user_serializer_instance.errors, "message": "There's an error in username or password"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"errors": user_serializer_instance.errors, "message": "There's an error in username or password"},
+                status=status.HTTP_400_BAD_REQUEST)
 
         if user_serializer_instance.is_valid() and user_data_serializer_instance.is_valid():
             user_instance = user_serializer_instance.save()
@@ -55,7 +60,6 @@ def signup(request):
                     group = Group.objects.get(name=group_name)
                     group.user_set.add(user_instance)
 
-                
                 user_name = data['username']
                 email_message = f"""\
                 Welcome to BPC - Your Registration Was Successful
@@ -75,22 +79,25 @@ def signup(request):
                 Best regards,
                 BPC Team
                 """
-                send_mail('Welcome to BPC - Registration Successful', email_message, settings.DEFAULT_FROM_EMAIL, [data['email']])
+                send_mail('Welcome to BPC - Registration Successful', email_message, settings.DEFAULT_FROM_EMAIL,
+                          [data['email']])
 
                 return Response({"message": "User and user data saved successfully."}, status=status.HTTP_200_OK)
             else:
-                return Response({"errors": user_data_serializer_instance.errors, "message": "There's an error with user details"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"errors": user_data_serializer_instance.errors, "message": "There's an error with user details"},
+                    status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({"errors": user_serializer_instance.errors, "message": "There's an error with user data"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"errors": user_serializer_instance.errors, "message": "There's an error with user data"},
+                            status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response({"message": "There is a method error"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-
 @api_view(['POST'])
-def login (request):
-    if request.method=='POST':
-        data=request.data
+def login(request):
+    if request.method == 'POST':
+        data = request.data
         print('**************************')
         print('**************************')
         print('**************************')
@@ -98,34 +105,33 @@ def login (request):
         print('**************************')
         print('**************************')
         print('**************************')
-        login_data=login_serializer(data=data)
+        login_data = login_serializer(data=data)
 
         if login_data.is_valid():
             username = login_data.validated_data['username']
             password = login_data.validated_data['password']
-            user =authenticate(request , username=username,password=password)
-            if username=='admin' and password=='admin':
-                return Response({"username": username, "name": user.first_name, "category":"admin"}, status=status.HTTP_200_OK)
+            user = authenticate(request, username=username, password=password)
+            if username == 'admin' and password == 'admin':
+                return Response({"username": username, "name": user.first_name, "category": "admin"},
+                                status=status.HTTP_200_OK)
             if user is not None:
-                user_detail=user_data.objects.get(user_id=user.id)
-                user_Serializer=user_serializer(user)
-                user_detail_serializer=user_data_serializer(user_detail)
-                combined_data=user_Serializer.data
+                user_detail = user_data.objects.get(user_id=user.id)
+                user_Serializer = user_serializer(user)
+                user_detail_serializer = user_data_serializer(user_detail)
+                combined_data = user_Serializer.data
                 combined_data.update(user_detail_serializer.data)
 
                 return Response(combined_data)
             else:
                 return Response({"message": "Authentication failed"})
         else:
-            return Response({"message":"wrong credintials"})
+            return Response({"message": "wrong credintials"})
 
 
-
-
-@api_view(['Get','POST','PATCH','DELETE'])
-def  admin_control(request,id=None,category=None):
-    if request.method=='GET':
-        group=Group.objects.get(name=category)
+@api_view(['Get', 'POST', 'PATCH', 'DELETE'])
+def admin_control(request, id=None, category=None):
+    if request.method == 'GET':
+        group = Group.objects.get(name=category)
         group_data = User.objects.filter(groups=group).select_related('userdata')
         combined_data = []
         for user in group_data:
@@ -133,48 +139,46 @@ def  admin_control(request,id=None,category=None):
             user_data_serialized = user_data_serializer(user.userdata).data
             user_combined = {**user_serialized, **user_data_serialized}
             combined_data.append(user_combined)
-        return Response({"data":combined_data})
-    
- 
-    elif request.method=='PATCH':
-        data=request.data
-        record=User.objects.get(id=id)
-        detail_record=user_data.objects.get(user_id=id)
-        user_detail_data=user_data_serializer(instance=detail_record, data=data, partial=True)
-        userr_data=user_serializer(instance=record, data=data, partial=True)
+        return Response({"data": combined_data})
+
+
+    elif request.method == 'PATCH':
+        data = request.data
+        record = User.objects.get(id=id)
+        detail_record = user_data.objects.get(user_id=id)
+        user_detail_data = user_data_serializer(instance=detail_record, data=data, partial=True)
+        userr_data = user_serializer(instance=record, data=data, partial=True)
         if user_detail_data.is_valid() and userr_data.is_valid():
             user_detail_data.save()
             userr_data.save()
-            return Response({"mesaage":"saved "})
+            return Response({"mesaage": "saved "})
         else:
-            return Response({"mesaage":"error "})
+            return Response({"mesaage": "error "})
 
 
-    elif request.method=='DELETE':
+    elif request.method == 'DELETE':
         if id is not None:
-            record=User.objects.get(id=id)
+            record = User.objects.get(id=id)
             record.delete()
-            return Response({"mesaage":"deleted "})
+            return Response({"mesaage": "deleted "})
         else:
-            return Response({"mesaage":"error "})
+            return Response({"mesaage": "error "})
 
 
-@api_view(['GET','POST','PATCH'])
-def idea(request,id=None):
-    if request.method=='GET':
+@api_view(['GET', 'POST', 'PATCH'])
+def idea(request, id=None):
+    if request.method == 'GET':
         if id is not None:
-            uploaded_ideas=ideas.objects.filter(user_id=id)
-            serialized_data_ideas=IdeasSerializer(uploaded_ideas,many=True)
+            uploaded_ideas = ideas.objects.filter(user_id=id)
+            serialized_data_ideas = IdeasSerializer(uploaded_ideas, many=True)
             return Response(serialized_data_ideas.data, status=status.HTTP_200_OK)
         else:
-            uploaded_ideas=ideas.objects.all()
-            serialized_data_ideas=IdeasSerializer(uploaded_ideas,many=True)
+            uploaded_ideas = ideas.objects.all()
+            serialized_data_ideas = IdeasSerializer(uploaded_ideas, many=True)
             return Response(serialized_data_ideas.data, status=status.HTTP_200_OK)
 
-
-
-    if request.method=='POST':
-        data=request.data.copy()
+    if request.method == 'POST':
+        data = request.data.copy()
         print('**************************')
         print('**************************')
         print('**************************')
@@ -182,66 +186,66 @@ def idea(request,id=None):
         print('**************************')
         print('**************************')
         print('**************************')
-        data['user']=id
-        idea_data=IdeasSerializer(data=data)
+        data['user'] = id
+        idea_data = IdeasSerializer(data=data)
         if idea_data.is_valid():
             idea_data.save()
             return Response(idea_data.data, status=status.HTTP_200_OK)
         else:
             return Response(idea_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method=='PATCH':
-        
-        update_idea=ideas.objects.get(id=id)
-        data=request.data.copy()
-        serialized_data=IdeasSerializer(instance=update_idea,data=data,partial=True)
+    if request.method == 'PATCH':
+
+        update_idea = ideas.objects.get(id=id)
+        data = request.data.copy()
+        serialized_data = IdeasSerializer(instance=update_idea, data=data, partial=True)
         if serialized_data.is_valid():
             serialized_data.save()
             return Response(serialized_data.data, status=status.HTTP_200_OK)
         else:
             return Response(serialized_data.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
 
 @api_view(['GET'])
-def single_idea(request,id):
-    if request.method=='GET':
-        idea=ideas.objects.get(id=id)
-        serialized=IdeasSerializer(idea)
-        return Response(serialized.data,status=status.HTTP_200_OK)
+def single_idea(request, id):
+    if request.method == 'GET':
+        idea = ideas.objects.get(id=id)
+        serialized = IdeasSerializer(idea)
+        return Response(serialized.data, status=status.HTTP_200_OK)
     else:
         return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
-def get_user_by_id(request,id):
-    if request.method=='GET':
-        user=User.objects.get(id=id)
-        serialized=user_serializer(user)
-        combined_data=serialized.data
-        user_detail=user_data.objects.get(user_id=user.id)
-        detail_serializer=user_data_serializer(user_detail)
+def get_user_by_id(request, id):
+    if request.method == 'GET':
+        user = User.objects.get(id=id)
+        serialized = user_serializer(user)
+        combined_data = serialized.data
+        user_detail = user_data.objects.get(user_id=user.id)
+        detail_serializer = user_data_serializer(user_detail)
         combined_data.update(detail_serializer.data)
 
-        return Response(combined_data,status=status.HTTP_200_OK)
+        return Response(combined_data, status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
-@api_view(['GET','POST','PATCH'])
-def skills(request,id=None):
-    if request.method=='GET':
+@api_view(['GET', 'POST', 'PATCH'])
+def skills(request, id=None):
+    if request.method == 'GET':
         if id is not None:
-            uploaded_gig=skill.objects.filter(user_id=id)
-            serialized_data_gig=SkillSerializer(uploaded_gig,many=True)
+            uploaded_gig = skill.objects.filter(user_id=id)
+            serialized_data_gig = SkillSerializer(uploaded_gig, many=True)
             return Response(serialized_data_gig.data, status=status.HTTP_200_OK)
         else:
-            uploaded_gig=skill.objects.all()
-            serialized_data_gig=SkillSerializer(uploaded_gig,many=True)
+            uploaded_gig = skill.objects.all()
+            serialized_data_gig = SkillSerializer(uploaded_gig, many=True)
             return Response(serialized_data_gig.data, status=status.HTTP_200_OK)
 
-    if request.method=='POST':
-        data=request.data.copy()
-        data['user']=id
+    if request.method == 'POST':
+        data = request.data.copy()
+        data['user'] = id
         print('**************************')
         print('**************************')
         print('**************************')
@@ -249,32 +253,34 @@ def skills(request,id=None):
         print('**************************')
         print('**************************')
         print('**************************')
-        gig_data=SkillSerializer(data=data)
+        gig_data = SkillSerializer(data=data)
         if gig_data.is_valid():
             gig_data.save()
             return Response(gig_data.data, status=status.HTTP_200_OK)
         else:
             return Response(gig_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method=='PATCH':
-        
-        update_gig=skill.objects.get(id=id)
-        data=request.data.copy()
-        serialized_data=SkillSerializer(instance=update_gig,data=data,partial=True)
+    if request.method == 'PATCH':
+
+        update_gig = skill.objects.get(id=id)
+        data = request.data.copy()
+        serialized_data = SkillSerializer(instance=update_gig, data=data, partial=True)
         if serialized_data.is_valid():
             serialized_data.save()
             return Response(serialized_data.data, status=status.HTTP_200_OK)
         else:
             return Response(serialized_data.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
+
 @api_view(['GET'])
-def single_gig(request,id):
-    if request.method=='GET':
-        gig=skill.objects.get(id=id)
-        serialized=SkillSerializer(gig)
-        return Response(serialized.data,status=status.HTTP_200_OK)
+def single_gig(request, id):
+    if request.method == 'GET':
+        gig = skill.objects.get(id=id)
+        serialized = SkillSerializer(gig)
+        return Response(serialized.data, status=status.HTTP_200_OK)
     else:
-        return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)            
+        return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def post_contract(request):
@@ -283,26 +289,26 @@ def post_contract(request):
         print('**************************')
         print('**************************')
         print('**************************')
-        print(data) 
+        print(data)
         print('**************************')
         print('**************************')
         print('**************************')
-        
+
         contract_serializer = ContractSerializer(data=data)
 
-        if contract_serializer.is_valid() :
+        if contract_serializer.is_valid():
             contract_instance = contract_serializer.save()
-            
+
             # Now, handle the ContractUser data
             contract_user_data = {
                 'contract': contract_instance.id,
                 'investor': data.get('investor'),
                 'entrepreneur': data.get('entrepreneur')
             }
-            
+
             print('**************************')
             print('**************************')
-            print('**************************') 
+            print('**************************')
             print(contract_user_data)
             print('**************************')
             print('**************************')
@@ -317,7 +323,6 @@ def post_contract(request):
         return Response(contract_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-    
 @api_view(['GET'])
 def inv_done_contracts(request, id=None):
     if request.method == 'GET':
@@ -326,15 +331,15 @@ def inv_done_contracts(request, id=None):
                 contract_users = ContractUser.objects.filter(investor_id=id)
                 contracts = [cu.contract for cu in contract_users]
                 ideas_list = [c.idea for c in contracts]
-                
+
                 serialized_contracts = ContractSerializer(contracts, many=True)
                 serialized_ideas = IdeasSerializer(ideas_list, many=True)
-                
+
                 response_data = {
                     'contracts': serialized_contracts.data,
                     'ideas': serialized_ideas.data
                 }
-                
+
                 return Response(response_data, status=status.HTTP_200_OK)
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -345,38 +350,39 @@ def inv_done_contracts(request, id=None):
                 contract_users = ContractUser.objects.all()
                 contracts = [cu.contract for cu in contract_users]
                 ideas_list = [c.idea for c in contracts]
-                
+
                 serialized_contracts = ContractSerializer(contracts, many=True)
                 serialized_ideas = IdeasSerializer(ideas_list, many=True)
-                
+
                 response_data = {
                     'contracts': serialized_contracts.data,
                     'ideas': serialized_ideas.data
                 }
-                
+
                 return Response(response_data, status=status.HTTP_200_OK)
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
 def ent_done_contracts(request, id=None):
-     if request.method == 'GET':
+    if request.method == 'GET':
         if id is not None:
             try:
                 contract_users = ContractUser.objects.filter(entrepreneur_id=id)
                 contracts = [cu.contract for cu in contract_users]
                 ideas_list = [c.idea for c in contracts]
-                
+
                 serialized_contracts = ContractSerializer(contracts, many=True)
                 serialized_ideas = IdeasSerializer(ideas_list, many=True)
-                
+
                 response_data = {
                     'contracts': serialized_contracts.data,
                     'ideas': serialized_ideas.data
                 }
-                
+
                 return Response(response_data, status=status.HTTP_200_OK)
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -387,15 +393,15 @@ def ent_done_contracts(request, id=None):
                 contract_users = ContractUser.objects.all()
                 contracts = [cu.contract for cu in contract_users]
                 ideas_list = [c.idea for c in contracts]
-                
+
                 serialized_contracts = ContractSerializer(contracts, many=True)
                 serialized_ideas = IdeasSerializer(ideas_list, many=True)
-                
+
                 response_data = {
                     'contracts': serialized_contracts.data,
                     'ideas': serialized_ideas.data
                 }
-                
+
                 return Response(response_data, status=status.HTTP_200_OK)
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -403,89 +409,91 @@ def ent_done_contracts(request, id=None):
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET','POST'])
-def tracking_record(request,id=None):
-    if request.method=='GET':
-        records=tracking.objects.filter(contract=id)
-        serialized=TrackingSerializer(records,many=True)
-        return Response(serialized.data,status=status.HTTP_200_OK)
-    
-    if request.method=='POST':
-        data= request.data.copy()
+@api_view(['GET', 'POST'])
+def tracking_record(request, id=None):
+    if request.method == 'GET':
+        records = tracking.objects.filter(contract=id)
+        serialized = TrackingSerializer(records, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+
+    if request.method == 'POST':
+        data = request.data.copy()
         print('**************************')
         print('**************************')
         print('**************************')
-        print(data) 
+        print(data)
         print('**************************')
         print('**************************')
         print('**************************')
-        serialized=TrackingSerializer(data=data)
+        serialized = TrackingSerializer(data=data)
         if serialized.is_valid():
             serialized.save()
-            return Response(serialized.data,status=status.HTTP_200_OK)
+            return Response(serialized.data, status=status.HTTP_200_OK)
         else:
-            return Response(serialized.errors,status=status.HTTP_400_BAD_REQUEST)
+            return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 def record_count(request, id=None, category=None):
     if request.method == 'GET':
         response_data = {}
-        
+
         if category == 'investor':
             contract_users = ContractUser.objects.filter(investor_id=id).order_by('-id')[:2]
             contracts = [cu.contract for cu in contract_users]
             ideas_list = [c.idea for c in contracts]
-            
+
             serialized_contracts = ContractSerializer(contracts, many=True)
             serialized_ideas = IdeasSerializer(ideas_list, many=True)
-            
+
             response_data = {
                 'contracts': serialized_contracts.data,
                 'ideas': serialized_ideas.data
             }
-        
+
         elif category == 'entrepreneur':
             contract_users = ContractUser.objects.filter(entrepreneur_id=id).order_by('-id')[:2]
             contracts = [cu.contract for cu in contract_users]
             ideas_list = [c.idea for c in contracts]
-            
+
             total_ideas = ideas.objects.filter(user_id=id).count()
             total_contracts = ContractUser.objects.filter(entrepreneur_id=id).count()
-            
+
             serialized_contracts = ContractSerializer(contracts, many=True)
             serialized_ideas = IdeasSerializer(ideas_list, many=True)
-            
+
             response_data = {
                 'contracts': serialized_contracts.data,
                 'ideas': serialized_ideas.data,
                 'total_ideas': total_ideas,
                 'total_contracts': total_contracts
             }
-        
+
         elif category == 'skilled':
             total_skills = skill.objects.filter(user_id=id).count()
             response_data = {
                 'total_skills': total_skills
             }
-        
+
         elif category == 'admin':
             total_contracts = contract.objects.count()
             ideas_list = ideas.objects.filter(contract__isnull=False)
-            
+
             serialized_ideas = IdeasSerializer(ideas_list, many=True)
-            
+
             response_data = {
                 'total_contracts': total_contracts,
                 'ideas': serialized_ideas.data
             }
-        
+
         else:
             return Response({'error': 'Invalid category'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response(response_data, status=status.HTTP_200_OK)        
 
-@api_view(['GET','POST'])
-def profile_pfp(request,id=None):
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET', 'POST'])
+def profile_pfp(request, id=None):
     if request.method == 'GET':
         try:
             get_pfp = pfp.objects.get(user_id=id)
@@ -500,12 +508,13 @@ def profile_pfp(request,id=None):
             serialized = PfpSerializer(profile_picture, data=data)
         except pfp.DoesNotExist:
             serialized = PfpSerializer(data=data)
-        
+
         if serialized.is_valid():
             serialized.save()
             return Response(serialized.data, status=status.HTTP_200_OK)
         else:
             return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['DELETE'])
 def record_delete(request, id=None, record=None):
@@ -528,8 +537,8 @@ def record_delete(request, id=None, record=None):
             instance = get_object_or_404(pfp, id=id)
         else:
             return Response({'error': 'Invalid record type'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         instance.delete()
         return Response({'message': f'{record} record deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-    
+
     return Response({'error': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)

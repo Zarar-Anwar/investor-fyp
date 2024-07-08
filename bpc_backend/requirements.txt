@@ -17,6 +17,8 @@ django-crispy-forms
 djangorestframework
 dj-rest-auth
 
+jazzmin
+django-cors-headers
 crispy-bootstrap5
 django-browser-reload
 drf-yasg
