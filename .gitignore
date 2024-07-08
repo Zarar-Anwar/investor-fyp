@@ -1,0 +1,44 @@
+# Ignore Django related files
+/bpc_backend/db.sqlite3
+/bpc_backend/media/
+
+# Ignore Node.js related files
+/frontedBoilerPlate/node_modules/
+/frontedBoilerPlate/.idea/
+/frontedBoilerPlate/.vscode/
+/frontedBoilerPlate/.env
+/frontedBoilerPlate/.eslintcache
+/frontedBoilerPlate/.npm
+/frontedBoilerPlate/.yarn
+/frontedBoilerPlate/build/
+/frontedBoilerPlate/dist/
+/frontedBoilerPlate/.cache/
+/frontedBoilerPlate/.next/
+/frontedBoilerPlate/.nuxt/
+/frontedBoilerPlate/yarn.lock
+/frontedBoilerPlate/package-lock.json
+
+# Ignore editor specific files
+*.sublime-project
+*.sublime-workspace
+.vscode/
+.idea/
+
+# Ignore environment-specific settings
+.env
+
+# Ignore compiled files
+*.pyc
+*.pyo
+
+# Ignore log files
+*.log
+logs/
+
+# Ignore dependency directories
+/env/
+/lib/
+/lib64/
+/parts/
+/sdist/
+/vendor/
