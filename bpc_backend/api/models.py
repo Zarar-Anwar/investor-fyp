@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 
 class user_data(models.Model):
+    is_admin = models.BooleanField(default=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='userdata')
     name = models.CharField(max_length=50)
     email = models.EmailField()

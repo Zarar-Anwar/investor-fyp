@@ -178,9 +178,10 @@ def idea(request, id=None):
             return Response(serialized_data_ideas.data, status=status.HTTP_200_OK)
 
     if request.method == 'POST':
-        data = request.data.copy()
+        data = request.data
         print('**************************')
         print('**************************')
+
         print('**************************')
         print(data)
         print('**************************')
@@ -195,7 +196,6 @@ def idea(request, id=None):
             return Response(idea_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'PATCH':
-
         update_idea = ideas.objects.get(id=id)
         data = request.data.copy()
         serialized_data = IdeasSerializer(instance=update_idea, data=data, partial=True)
@@ -231,6 +231,91 @@ def get_user_by_id(request, id):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['GET'])
+def get_all_users_enterprenuer(request):
+    if request.method == 'GET':
+        users = User.objects.filter(userdata__category='entrepreneur')
+        serialized_users = user_serializer(users, many=True)
+
+        combined_data = []
+        for user, serialized_user in zip(users, serialized_users.data):
+            try:
+                user_detail = user_data.objects.get(user=user)
+                detail_serializer = user_data_serializer(user_detail)
+                combined_user_data = serialized_user
+                combined_user_data.update(detail_serializer.data)
+                combined_data.append(combined_user_data)
+            except user_data.DoesNotExist:
+                # Handle case where user_data does not exist for the user
+                combined_data.append(serialized_user)
+
+        return Response(combined_data, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_all_users_investor(request):
+    if request.method == 'GET':
+        users = User.objects.filter(userdata__category='investor')
+        serialized_users = user_serializer(users, many=True)
+
+        combined_data = []
+        for user, serialized_user in zip(users, serialized_users.data):
+            try:
+                user_detail = user_data.objects.get(user=user)
+                detail_serializer = user_data_serializer(user_detail)
+                combined_user_data = serialized_user
+                combined_user_data.update(detail_serializer.data)
+                combined_data.append(combined_user_data)
+            except user_data.DoesNotExist:
+                # Handle case where user_data does not exist for the user
+                combined_data.append(serialized_user)
+
+        return Response(combined_data, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_all_users_skilled_person(request):
+    if request.method == 'GET':
+        users = User.objects.filter(userdata__category='skilled')
+        serialized_users = user_serializer(users, many=True)
+
+        combined_data = []
+        for user, serialized_user in zip(users, serialized_users.data):
+            try:
+                user_detail = user_data.objects.get(user=user)
+                detail_serializer = user_data_serializer(user_detail)
+                combined_user_data = serialized_user
+                combined_user_data.update(detail_serializer.data)
+                combined_data.append(combined_user_data)
+            except user_data.DoesNotExist:
+                # Handle case where user_data does not exist for the user
+                combined_data.append(serialized_user)
+
+        return Response(combined_data, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_user_skilled(request):
+    if request.method == 'GET':
+        skilled_user = skill.objects.all()
+        serializer = SkillSerializer(skilled_user, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_all_contracts(request):
+    if request.method == 'GET':
+        all_contract = contract.objects.all()
+        serializer = ContractSerializer(all_contract, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 @api_view(['GET', 'POST', 'PATCH'])
 def skills(request, id=None):
     if request.method == 'GET':
@@ -244,7 +329,7 @@ def skills(request, id=None):
             return Response(serialized_data_gig.data, status=status.HTTP_200_OK)
 
     if request.method == 'POST':
-        data = request.data.copy()
+        data = request.data
         data['user'] = id
         print('**************************')
         print('**************************')
