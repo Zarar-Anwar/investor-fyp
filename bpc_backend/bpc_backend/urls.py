@@ -35,6 +35,7 @@ urlpatterns = [
     path('get_all_users_enterprenuer/', views.get_all_users_enterprenuer),
     path('get_all_users_investor/', views.get_all_users_investor),
     path('get_all_users_skilled_person/', views.get_all_users_skilled_person),
+    path('delete_user_by_id/<int:id>/', views.delete_user_by_id),
     path('get_user_skilled/', views.get_user_skilled),
     path('get_all_contracts/', views.get_all_contracts),
     path('update_idea/<int:id>/', views.idea),

@@ -278,6 +278,16 @@ def get_all_users_investor(request):
 
 
 @api_view(['GET'])
+def delete_user_by_id(request, id):
+    try:
+        user = User.objects.get(id=id)
+        user.delete()
+        return Response({"message": "User deleted successfully"}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
 def get_all_users_skilled_person(request):
     if request.method == 'GET':
         users = User.objects.filter(userdata__category='skilled')

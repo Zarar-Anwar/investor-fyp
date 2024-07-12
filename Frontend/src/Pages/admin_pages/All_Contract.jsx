@@ -6,18 +6,20 @@ import { Store } from "../../Services/Store"
 import Ideas from "./Ideas"
 
 const All_Contracts = () => {
-    const [user_list,serUserList] = useState()
-    const {state , dispatch} = useContext(Store)
-    const {UserInfo} = state
+    const [user_list, serUserList] = useState()
+    const { state, dispatch } = useContext(Store)
+    const { UserInfo } = state
+
+    
     const get_all_user_list = async () => {
         try {
             const { data } = await api.get(`get_all_contracts/`)
-           serUserList(data)
+            serUserList(data)
         } catch (error) {
             toast.error(error.message)
         }
     }
-console.log(user_list)
+    console.log(user_list)
     useEffect(() => {
         get_all_user_list()
     }, get_all_user_list)
@@ -37,7 +39,7 @@ console.log(user_list)
                 <div className="col-lg-12">
                     <div className="card">
                         <div className="card-body">
-                        
+
                             <div className="table-responsive">
                                 {user_list ?
                                     <>
@@ -65,14 +67,14 @@ console.log(user_list)
                                                             <td>{object.idea.idea}</td>
                                                             <td>{object.idea_title}</td>
                                                             <td>
-                                                          
+
                                                                 <Link
-                                                                    to={'#'}
+                                                                    to={`/delete_user_by_id/${object.user}`}
                                                                     className="btn btn-primary btn-sm btn-rounded waves-effect waves-light"
                                                                 >
                                                                     TRACKING
                                                                 </Link>
-                                                               
+
                                                             </td>
                                                         </tr>
                                                     ))

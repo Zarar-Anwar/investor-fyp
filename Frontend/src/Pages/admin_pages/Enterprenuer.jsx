@@ -9,6 +9,19 @@ const Enterprenuer = () => {
     const [user_list,serUserList] = useState()
     const {state , dispatch} = useContext(Store)
     const {UserInfo} = state
+
+    const handleDelete=async(id)=>{
+
+        try {
+            const data = await api.get(`/delete_user_by_id/${id}`)
+            toast.success("User Deleted")
+        } catch (error) {
+            toast.error(error.message)
+        }
+
+    }
+
+
     const get_all_user_list = async () => {
         try {
             const { data } = await api.get(`get_all_users_enterprenuer/`)
@@ -78,12 +91,13 @@ console.log(user_list)
                                                             <td>{object.description}</td>
                                                           
                                                             <td>
-                                                                <Link
-                                                                    to={'#'}
+                                                                <button
+
+                                                                    onClick={()=>{handleDelete(object.user)}}
                                                                     className="btn btn-danger btn-sm btn-rounded waves-effect waves-light"
                                                                 >
                                                                     DELETE
-                                                                </Link>
+                                                                </button>
                                                                
                                                             </td>
                                                         </tr>
@@ -95,7 +109,6 @@ console.log(user_list)
                                             </tbody>
                                         </table>
                                     </>
-
                                     :
                                     <div className="text-center">
                                         <span className="text-danger bolder">No User Data Available</span>

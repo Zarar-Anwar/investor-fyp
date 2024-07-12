@@ -6,18 +6,30 @@ import { Store } from "../../Services/Store"
 import Ideas from "./Ideas"
 
 const Skilled_Person = () => {
-    const [user_list,serUserList] = useState()
-    const {state , dispatch} = useContext(Store)
-    const {UserInfo} = state
+    const [user_list, serUserList] = useState()
+    const { state, dispatch } = useContext(Store)
+    const { UserInfo } = state
+
+    const handleDelete = async (id) => {
+
+        try {
+            const data = await api.get(`/delete_user_by_id/${id}`)
+            toast.success("User Deleted")
+        } catch (error) {
+            toast.error(error.message)
+        }
+
+    }
+
     const get_all_user_list = async () => {
         try {
             const { data } = await api.get(`get_all_users_skilled_person/`)
-           serUserList(data)
+            serUserList(data)
         } catch (error) {
             toast.error(error.message)
         }
     }
-console.log(user_list)
+    console.log(user_list)
     useEffect(() => {
         get_all_user_list()
     }, get_all_user_list)
@@ -37,7 +49,7 @@ console.log(user_list)
                 <div className="col-lg-12">
                     <div className="card">
                         <div className="card-body">
-                        
+
                             <div className="table-responsive">
                                 {user_list ?
                                     <>
@@ -76,15 +88,16 @@ console.log(user_list)
                                                             <td>{object.gender}</td>
                                                             <td>{object.address}</td>
                                                             <td>{object.description}</td>
-                                                          
+
                                                             <td>
-                                                                <Link
-                                                                    to={'#'}
+                                                                <button
+
+                                                                    onClick={() => { handleDelete(object.user) }}
                                                                     className="btn btn-danger btn-sm btn-rounded waves-effect waves-light"
                                                                 >
                                                                     DELETE
-                                                                </Link>
-                                                               
+                                                                </button>
+
                                                             </td>
                                                         </tr>
                                                     ))
