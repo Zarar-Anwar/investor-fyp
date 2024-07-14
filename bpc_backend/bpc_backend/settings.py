@@ -169,3 +169,5 @@ CORS_ALLOW_METHODS = (
     "POST",
     "PUT",  
 )
+
+CORS_ALLOW_CREDENTIALS = True  # If your frontend sends cookies along with requests

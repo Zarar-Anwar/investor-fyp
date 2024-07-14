@@ -1,8 +1,11 @@
+import json
+
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from .serializers import user_data_serializer, user_serializer, login_serializer, IdeasSerializer, ContractSerializer, \
-    contarctuser, SkillSerializer, TrackingSerializer, PfpSerializer
+    SkillSerializer, TrackingSerializer, PfpSerializer
 from django.contrib.auth.hashers import make_password
 from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
@@ -10,7 +13,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from rest_framework import status
 from django.contrib.auth import authenticate
-from .models import user_data, ideas, skill, contract, ContractUser, tracking, pfp
+from .models import user_data, ideas, skill, contract, tracking, pfp
 
 
 # Create your views here.
@@ -123,9 +126,9 @@ def login(request):
 
                 return Response(combined_data)
             else:
-                return Response({"message": "Authentication failed"})
+                return Response({"message": "Authentication failed"}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({"message": "wrong credintials"})
+            return Response({"message": "wrong credintials"}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['Get', 'POST', 'PATCH', 'DELETE'])
@@ -438,90 +441,162 @@ def post_contract(request):
         return Response(contract_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
-def inv_done_contracts(request, id=None):
-    if request.method == 'GET':
-        if id is not None:
-            try:
-                contract_users = ContractUser.objects.filter(investor_id=id)
-                contracts = [cu.contract for cu in contract_users]
-                ideas_list = [c.idea for c in contracts]
+@api_view(['POST'])
+def create_contract(request):
+    try:
+        data = json.loads(request.body)
+        idea_id = data.get('idea_id')
+        user_id = data.get('user_id')
+        idea_instance = ideas.objects.get(id=idea_id)
+        entrepreneur = idea_instance.user
 
-                serialized_contracts = ContractSerializer(contracts, many=True)
-                serialized_ideas = IdeasSerializer(ideas_list, many=True)
+        new_contract = contract.objects.create(
+            idea=idea_instance,
+            idea_title=idea_instance.idea,
+            terms_conditions=idea_instance.terms_conditions,
+            investor_id=user_id,
+            entrepreneur=entrepreneur,
+        )
 
-                response_data = {
-                    'contracts': serialized_contracts.data,
-                    'ideas': serialized_ideas.data
-                }
-
-                return Response(response_data, status=status.HTTP_200_OK)
-            except User.DoesNotExist:
-                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        elif id is None:
-            try:
-                contract_users = ContractUser.objects.all()
-                contracts = [cu.contract for cu in contract_users]
-                ideas_list = [c.idea for c in contracts]
-
-                serialized_contracts = ContractSerializer(contracts, many=True)
-                serialized_ideas = IdeasSerializer(ideas_list, many=True)
-
-                response_data = {
-                    'contracts': serialized_contracts.data,
-                    'ideas': serialized_ideas.data
-                }
-
-                return Response(response_data, status=status.HTTP_200_OK)
-            except User.DoesNotExist:
-                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'message': 'Contract created successfully', 'contract_id': new_contract.id}, status=201)
+    except ideas.DoesNotExist:
+        return JsonResponse({'error': 'Idea not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
 
 @api_view(['GET'])
-def ent_done_contracts(request, id=None):
+def get_contract_by_id(request, id):
     if request.method == 'GET':
-        if id is not None:
-            try:
-                contract_users = ContractUser.objects.filter(entrepreneur_id=id)
-                contracts = [cu.contract for cu in contract_users]
-                ideas_list = [c.idea for c in contracts]
+        try:
+            contracts = contract.objects.filter(investor_id=id)
+            if contracts:
+                serialized = ContractSerializer(contracts, many=True)
+                return Response(serialized.data, status=status.HTTP_200_OK)
+            else:
+                contract_1 = contract.objects.filter(entrepreneur_id=id)
+                serialized = ContractSerializer(contract_1, many=True)
+                return Response(serialized.data, status=status.HTTP_200_OK)
 
-                serialized_contracts = ContractSerializer(contracts, many=True)
-                serialized_ideas = IdeasSerializer(ideas_list, many=True)
 
-                response_data = {
-                    'contracts': serialized_contracts.data,
-                    'ideas': serialized_ideas.data
-                }
+        except contract.DoesNotExist:
+            return Response({"error": "Contracts not found for this investor."}, status=status.HTTP_404_NOT_FOUND)
+    else:
+        return Response({"error": "Method not allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-                return Response(response_data, status=status.HTTP_200_OK)
-            except User.DoesNotExist:
-                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        elif id is None:
-            try:
-                contract_users = ContractUser.objects.all()
-                contracts = [cu.contract for cu in contract_users]
-                ideas_list = [c.idea for c in contracts]
 
-                serialized_contracts = ContractSerializer(contracts, many=True)
-                serialized_ideas = IdeasSerializer(ideas_list, many=True)
+@api_view(['GET'])
+def get_tracking_by_id(request, id):
+    if request.method == 'GET':
+        try:
+            # Retrieve the tracking records by contract_id
+            tracking_instances = tracking.objects.filter(contract_id=id)
 
-                response_data = {
-                    'contracts': serialized_contracts.data,
-                    'ideas': serialized_ideas.data
-                }
+            # Serialize the instances
+            serialized = TrackingSerializer(tracking_instances, many=True)
 
-                return Response(response_data, status=status.HTTP_200_OK)
-            except User.DoesNotExist:
-                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serialized.data, status=status.HTTP_200_OK)
+
+        except tracking.DoesNotExist:
+            return Response({"error": "Tracking records not found."})
+
+    return Response({"error": "Method not allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['POST'])
+def post_tracking(request):
+    if request.method == 'POST':
+        serializer = TrackingSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# @api_view(['GET'])
+# def inv_done_contracts(request, id=None):
+#     if request.method == 'GET':
+#         if id is not None:
+#             try:
+#                 contract_users = ContractUser.objects.filter(investor_id=id)
+#                 contracts = [cu.contract for cu in contract_users]
+#                 ideas_list = [c.idea for c in contracts]
+#
+#                 serialized_contracts = ContractSerializer(contracts, many=True)
+#                 serialized_ideas = IdeasSerializer(ideas_list, many=True)
+#
+#                 response_data = {
+#                     'contracts': serialized_contracts.data,
+#                     'ideas': serialized_ideas.data
+#                 }
+#
+#                 return Response(response_data, status=status.HTTP_200_OK)
+#             except User.DoesNotExist:
+#                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+#             except Exception as e:
+#                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+#         elif id is None:
+#             try:
+#                 contract_users = ContractUser.objects.all()
+#                 contracts = [cu.contract for cu in contract_users]
+#                 ideas_list = [c.idea for c in contracts]
+#
+#                 serialized_contracts = ContractSerializer(contracts, many=True)
+#                 serialized_ideas = IdeasSerializer(ideas_list, many=True)
+#
+#                 response_data = {
+#                     'contracts': serialized_contracts.data,
+#                     'ideas': serialized_ideas.data
+#                 }
+#
+#                 return Response(response_data, status=status.HTTP_200_OK)
+#             except User.DoesNotExist:
+#                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+#             except Exception as e:
+#                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# @api_view(['GET'])
+# def ent_done_contracts(request, id=None):
+#     if request.method == 'GET':
+#         if id is not None:
+#             try:
+#                 contract_users = ContractUser.objects.filter(entrepreneur_id=id)
+#                 contracts = [cu.contract for cu in contract_users]
+#                 ideas_list = [c.idea for c in contracts]
+#
+#                 serialized_contracts = ContractSerializer(contracts, many=True)
+#                 serialized_ideas = IdeasSerializer(ideas_list, many=True)
+#
+#                 response_data = {
+#                     'contracts': serialized_contracts.data,
+#                     'ideas': serialized_ideas.data
+#                 }
+#
+#                 return Response(response_data, status=status.HTTP_200_OK)
+#             except User.DoesNotExist:
+#                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+#             except Exception as e:
+#                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+#         elif id is None:
+#             try:
+#                 contract_users = ContractUser.objects.all()
+#                 contracts = [cu.contract for cu in contract_users]
+#                 ideas_list = [c.idea for c in contracts]
+#
+#                 serialized_contracts = ContractSerializer(contracts, many=True)
+#                 serialized_ideas = IdeasSerializer(ideas_list, many=True)
+#
+#                 response_data = {
+#                     'contracts': serialized_contracts.data,
+#                     'ideas': serialized_ideas.data
+#                 }
+#
+#                 return Response(response_data, status=status.HTTP_200_OK)
+#             except User.DoesNotExist:
+#                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+#             except Exception as e:
+#                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'POST'])
@@ -548,64 +623,64 @@ def tracking_record(request, id=None):
             return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
-def record_count(request, id=None, category=None):
-    if request.method == 'GET':
-        response_data = {}
-
-        if category == 'investor':
-            contract_users = ContractUser.objects.filter(investor_id=id).order_by('-id')[:2]
-            contracts = [cu.contract for cu in contract_users]
-            ideas_list = [c.idea for c in contracts]
-
-            serialized_contracts = ContractSerializer(contracts, many=True)
-            serialized_ideas = IdeasSerializer(ideas_list, many=True)
-
-            response_data = {
-                'contracts': serialized_contracts.data,
-                'ideas': serialized_ideas.data
-            }
-
-        elif category == 'entrepreneur':
-            contract_users = ContractUser.objects.filter(entrepreneur_id=id).order_by('-id')[:2]
-            contracts = [cu.contract for cu in contract_users]
-            ideas_list = [c.idea for c in contracts]
-
-            total_ideas = ideas.objects.filter(user_id=id).count()
-            total_contracts = ContractUser.objects.filter(entrepreneur_id=id).count()
-
-            serialized_contracts = ContractSerializer(contracts, many=True)
-            serialized_ideas = IdeasSerializer(ideas_list, many=True)
-
-            response_data = {
-                'contracts': serialized_contracts.data,
-                'ideas': serialized_ideas.data,
-                'total_ideas': total_ideas,
-                'total_contracts': total_contracts
-            }
-
-        elif category == 'skilled':
-            total_skills = skill.objects.filter(user_id=id).count()
-            response_data = {
-                'total_skills': total_skills
-            }
-
-        elif category == 'admin':
-            total_contracts = contract.objects.count()
-            ideas_list = ideas.objects.filter(contract__isnull=False)
-
-            serialized_ideas = IdeasSerializer(ideas_list, many=True)
-
-            response_data = {
-                'total_contracts': total_contracts,
-                'ideas': serialized_ideas.data
-            }
-
-        else:
-            return Response({'error': 'Invalid category'}, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(response_data, status=status.HTTP_200_OK)
-
+# @api_view(['GET'])
+# def record_count(request, id=None, category=None):
+#     if request.method == 'GET':
+#         response_data = {}
+#
+#         if category == 'investor':
+#             contract_users = ContractUser.objects.filter(investor_id=id).order_by('-id')[:2]
+#             contracts = [cu.contract for cu in contract_users]
+#             ideas_list = [c.idea for c in contracts]
+#
+#             serialized_contracts = ContractSerializer(contracts, many=True)
+#             serialized_ideas = IdeasSerializer(ideas_list, many=True)
+#
+#             response_data = {
+#                 'contracts': serialized_contracts.data,
+#                 'ideas': serialized_ideas.data
+#             }
+#
+#         elif category == 'entrepreneur':
+#             contract_users = ContractUser.objects.filter(entrepreneur_id=id).order_by('-id')[:2]
+#             contracts = [cu.contract for cu in contract_users]
+#             ideas_list = [c.idea for c in contracts]
+#
+#             total_ideas = ideas.objects.filter(user_id=id).count()
+#             total_contracts = ContractUser.objects.filter(entrepreneur_id=id).count()
+#
+#             serialized_contracts = ContractSerializer(contracts, many=True)
+#             serialized_ideas = IdeasSerializer(ideas_list, many=True)
+#
+#             response_data = {
+#                 'contracts': serialized_contracts.data,
+#                 'ideas': serialized_ideas.data,
+#                 'total_ideas': total_ideas,
+#                 'total_contracts': total_contracts
+#             }
+#
+#         elif category == 'skilled':
+#             total_skills = skill.objects.filter(user_id=id).count()
+#             response_data = {
+#                 'total_skills': total_skills
+#             }
+#
+#         elif category == 'admin':
+#             total_contracts = contract.objects.count()
+#             ideas_list = ideas.objects.filter(contract__isnull=False)
+#
+#             serialized_ideas = IdeasSerializer(ideas_list, many=True)
+#
+#             response_data = {
+#                 'total_contracts': total_contracts,
+#                 'ideas': serialized_ideas.data
+#             }
+#
+#         else:
+#             return Response({'error': 'Invalid category'}, status=status.HTTP_400_BAD_REQUEST)
+#
+#         return Response(response_data, status=status.HTTP_200_OK)
+#
 
 @api_view(['GET', 'POST'])
 def profile_pfp(request, id=None):
@@ -630,30 +705,30 @@ def profile_pfp(request, id=None):
         else:
             return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-@api_view(['DELETE'])
-def record_delete(request, id=None, record=None):
-    if request.method == 'DELETE':
-        if record == 'user':
-            instance = get_object_or_404(User, id=id)
-        elif record == 'user_data':
-            instance = get_object_or_404(user_data, id=id)
-        elif record == 'idea':
-            instance = get_object_or_404(ideas, id=id)
-        elif record == 'skill':
-            instance = get_object_or_404(skill, id=id)
-        elif record == 'contract':
-            instance = get_object_or_404(contract, id=id)
-        elif record == 'contract_user':
-            instance = get_object_or_404(ContractUser, id=id)
-        elif record == 'tracking':
-            instance = get_object_or_404(tracking, id=id)
-        elif record == 'pfp':
-            instance = get_object_or_404(pfp, id=id)
-        else:
-            return Response({'error': 'Invalid record type'}, status=status.HTTP_400_BAD_REQUEST)
-
-        instance.delete()
-        return Response({'message': f'{record} record deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-
-    return Response({'error': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+#
+# @api_view(['DELETE'])
+# def record_delete(request, id=None, record=None):
+#     if request.method == 'DELETE':
+#         if record == 'user':
+#             instance = get_object_or_404(User, id=id)
+#         elif record == 'user_data':
+#             instance = get_object_or_404(user_data, id=id)
+#         elif record == 'idea':
+#             instance = get_object_or_404(ideas, id=id)
+#         elif record == 'skill':
+#             instance = get_object_or_404(skill, id=id)
+#         elif record == 'contract':
+#             instance = get_object_or_404(contract, id=id)
+#         elif record == 'contract_user':
+#             instance = get_object_or_404(ContractUser, id=id)
+#         elif record == 'tracking':
+#             instance = get_object_or_404(tracking, id=id)
+#         elif record == 'pfp':
+#             instance = get_object_or_404(pfp, id=id)
+#         else:
+#             return Response({'error': 'Invalid record type'}, status=status.HTTP_400_BAD_REQUEST)
+#
+#         instance.delete()
+#         return Response({'message': f'{record} record deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+#
+#     return Response({'error': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)

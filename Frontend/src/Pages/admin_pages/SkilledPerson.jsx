@@ -6,7 +6,7 @@ import { Store } from "../../Services/Store"
 import Ideas from "./Ideas"
 
 const SkilledPerson = () => {
-    const [skilled_person, setSkilledPerson] = useState()
+    const [skilled_person, setSkilledPerson] = useState([])
     const {state , dispatch} = useContext(Store)
     const {UserInfo} = state
     const get_all_skilled_person = async () => {
@@ -39,7 +39,7 @@ console.log(skilled_person)
                         <div className="card-body">
                         
                             <div className="table-responsive">
-                                {skilled_person ?
+                                {skilled_person.length > 0 ?
                                     <>
                                         <table className="table align-middle table-nowrap mb-0">
                                             <thead className="table-light">
@@ -89,8 +89,8 @@ console.log(skilled_person)
 
                                     :
                                     <div className="text-center">
-                                        <span className="text-danger bolder">No Ideas Data Available</span>
-                                    </div>
+                                        <span className="text-danger bolder"> <b>No Skilled Persons Available</b></span>
+                                        </div>
                                 }
                             </div>
                             {/* end table-responsive */}

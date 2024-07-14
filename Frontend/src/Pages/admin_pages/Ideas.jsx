@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react"
 import { Store } from "../../Services/Store"
 
 const Ideas = () => {
-    const [idea_data, setIdeaData] = useState()
+    const [idea_data, setIdeaData] = useState([])
     const {state , dispatch} = useContext(Store)
     const {UserInfo} = state
     const get_all_idea = async () => {
@@ -42,7 +42,7 @@ const Ideas = () => {
                                 </Link>
                             </div>
                             <div className="table-responsive">
-                                {idea_data ?
+                                {idea_data.length > 0 ?
                                     <>
                                         <table className="table align-middle table-nowrap mb-0">
                                             <thead className="table-light">
@@ -85,13 +85,7 @@ const Ideas = () => {
                                                                 >
                                                                     View
                                                                 </Link>
-                                                                {/* <Link
-                                                                    to={`/admin/add/contracts/${object.id}`}
-                                                                    className="btn btn-primary btn-sm btn-rounded waves-effect waves-light"
-
-                                                                >
-                                                                    Make Contracts
-                                                                </Link> */}
+                                                               
                                                             </td>
                                                         </tr>
                                                     ))
@@ -105,8 +99,8 @@ const Ideas = () => {
 
                                     :
                                     <div className="text-center">
-                                        <span className="text-danger bolder">No Ideas Data Available</span>
-                                    </div>
+                                        <span className="text-danger bolder"> <b>No Idea Data Available</b></span>
+                                        </div>
                                 }
                             </div>
                             {/* end table-responsive */}

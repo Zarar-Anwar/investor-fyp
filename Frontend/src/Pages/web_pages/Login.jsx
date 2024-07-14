@@ -32,9 +32,11 @@ function Login() {
           dispatch({type:'UserLoggedIn',payload:data})
           toast.success("Login SuccessFully")
           navigate("/admin/dashboard")
+          window.location.reload()
       } catch (error) {
+        console.log("error")
           if (error.response && error.response.data && error.response.data.message) {
-            setError(error.response.data.message)
+            toast.error(error.response.data.message)
           } else {
             setError("An error occurred during registration.");
           }

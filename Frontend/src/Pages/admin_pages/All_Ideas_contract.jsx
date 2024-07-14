@@ -6,6 +6,7 @@ import { Store } from "../../Services/Store"
 
 const All_Ideas = () => {
     const [idea_data, setIdeaData] = useState([])
+    const [checking, setChecking] = useState([])
     const { state, dispatch } = useContext(Store)
     const { UserInfo } = state
     const get_all_idea = async () => {
@@ -17,7 +18,16 @@ const All_Ideas = () => {
         }
     }
 
-    
+    const get_all_contract_list = async () => {
+        try {
+            const { data } = await api.get(`get_contract_by_id/${UserInfo.id}/`)
+            setChecking(data)
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+
     const handleDelete = async (id) => {
 
         try {
@@ -30,9 +40,23 @@ const All_Ideas = () => {
 
     }
 
+    const createContract = async (id) => {
+        try {
+            const data = {
+                idea_id: id,
+                user_id: UserInfo.id
+            }
+            await api.post('creating_contract/', data)
+            toast.success("Contracted Created SuccessFully")
+        } catch (error) {
+            toast.error(error.response.data.error)
+        }
+    }
+
 
     useEffect(() => {
         get_all_idea()
+        get_all_contract_list()
     }, get_all_idea)
 
 
@@ -89,16 +113,29 @@ const All_Ideas = () => {
                                                                 {object.file}
                                                             </td>
                                                             <td>
-                                                                {!UserInfo.is_admin?
-                                                                <Link
-                                                                to={`/admin/ideas/details?data=${encodeURIComponent(JSON.stringify(object))}`}
-                                                                className="btn btn-primary btn-sm btn-rounded waves-effect waves-light"
-                                                                >
-                                                                    View
-                                                                </Link>:null
-                                                            }
+                                                                {!UserInfo.is_admin ?
+                                                                    <>
+                                                                        <Link
+                                                                            to={`/admin/ideas/details?data=${encodeURIComponent(JSON.stringify(object))}`}
+                                                                            className="btn btn-primary btn-sm btn-rounded waves-effect waves-light"
+                                                                        >
+                                                                            View
+                                                                        </Link>
+                                                                        {UserInfo.category == 'investor' ?
+                                                                            checking.some(contract => contract.idea.id === object.id) ?
+                                                                                null :
+                                                                                <button
+                                                                                    onClick={() => { createContract(object.id) }}
+                                                                                    className="btn btn-success btn-sm btn-rounded waves-effect waves-light ml-1"
+                                                                                >
+                                                                                    Make Contracts
+                                                                                </button>
+                                                                            : null}
+                                                                    </>
+                                                                    : null
+                                                                }
                                                                 {UserInfo.is_admin ?
-                                                                    <button onClick={()=>{handleDelete(object.id)}}
+                                                                    <button onClick={() => { handleDelete(object.id) }}
                                                                         className="btn btn-danger btn-sm btn-rounded waves-effect waves-light"
                                                                     >
                                                                         DELETE

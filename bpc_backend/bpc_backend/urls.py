@@ -47,15 +47,19 @@ urlpatterns = [
     path('delete_gig_by_id/<int:id>/', views.delete_gig_by_id),
     path('update_gig/<int:id>/', views.skills),
     path('post_contract/', views.post_contract),
-    path('inv_done_contracts/<int:id>/', views.inv_done_contracts),
-    path('ent_done_contracts/<int:id>/', views.ent_done_contracts),
-    path('all_done_contracts/', views.inv_done_contracts),
-    path('post_tracking_record/', views.tracking_record),
-    path('get_tracking_record/<int:id>/', views.tracking_record),
-    path('dashboard_data/<int:id>/<str:category>/', views.record_count),
+    path('creating_contract/', views.create_contract),
+    path('get_contract_by_id/<int:id>/', views.get_contract_by_id),
+    path('get_tracking_by_id/<int:id>/', views.get_tracking_by_id),
+    path('post_tracking/', views.post_tracking),
+
+    # path('inv_done_contracts/<int:id>/', views.inv_done_contracts),
+    # path('ent_done_contracts/<int:id>/', views.ent_done_contracts),
+    # path('all_done_contracts/', views.inv_done_contracts),
+    # path('post_tracking_record/', views.tracking_record),
+    # path('dashboard_data/<int:id>/<str:category>/', views.record_count),
     path('post_pfp/', views.profile_pfp),
     path('get_pfp/<int:id>/', views.profile_pfp),
-    path('delete_record/<int:id>/<str:record>/', views.record_delete),
+    # path('delete_record/<int:id>/<str:record>/', views.record_delete),
     # category == 'admin','investor','entrepreneur','skilled'
 
 ]

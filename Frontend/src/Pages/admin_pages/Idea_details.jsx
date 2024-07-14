@@ -81,7 +81,7 @@ const Ideas_details = () => {
                                                 </div>
                                                 <hr />
                                                 <div className="my-5">
-                                                    <img src="assets/images/small/img-2.jpg" alt="" className="img-thumbnail mx-auto d-block" />
+                                                    <img src={`${process.env.REACT_APP_SERVER_ADDRESS}/${object.file}`} alt="" className="img-thumbnail mx-auto d-block" />
                                                 </div>
                                                 <hr />
                                                 <div className="mt-4">

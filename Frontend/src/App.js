@@ -26,6 +26,9 @@ import Investor from './Pages/admin_pages/Investor';
 import Skilled_Person from './Pages/admin_pages/Skilled_users';
 import All_Contracts from './Pages/admin_pages/All_Contract';
 import Edit_Gigs from './Pages/admin_pages/Edit_Gig';
+import ProjectTracking from './Pages/admin_pages/Project_Tracking';
+import Add_Project_tracking from './Pages/admin_pages/Add_project_tracking';
+import UpdateTracking from './Pages/admin_pages/UpdateTracking';
 function App() {
   return (
     <>
@@ -47,9 +50,6 @@ function App() {
           <Route path='/signup' element={<Main header="Registration"><Registration /></Main>} />
           <Route path='*' element={<PageNotFound />} />
 
-          {/* User Routes */}
-          <Route path='/user/login' element={<Login />} />
-
           {/* Admin Routes */}
           {/* <Route path='/admin' element={<AdminLogin/>} />    */}
           <Route path='/admin/dashboard' element={<Dashboard><MainAdmin /></Dashboard>} />
@@ -68,8 +68,11 @@ function App() {
           <Route path='/admin/edit/gig' element={<Dashboard><Edit_Gigs /></Dashboard>} />
 
 
-          {/* CONTRACTOR */}
+          {/* INVESTOR */}
           <Route path='/admin/all/ideas' element={<Dashboard><All_Ideas /></Dashboard>} />
+          <Route path='/admin/contract/tracking' element={<Dashboard><ProjectTracking /></Dashboard>} />
+          <Route path='/admin/add/contract/tracking' element={<Dashboard><Add_Project_tracking /></Dashboard>} />
+          <Route path='/admin/update/contract/tracking' element={<Dashboard><UpdateTracking /></Dashboard>} />
 
 
           {/* ADMIN */}

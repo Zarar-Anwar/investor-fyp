@@ -1,20 +1,36 @@
-import { useContext, useState } from "react";
 import { Link } from "react-router-dom"
-import { Store } from "../../Services/Store";
+import { toast } from "react-toastify"
+import api from "../../Services/Axios"
+import { useContext, useEffect, useState } from "react"
+import { Store } from "../../Services/Store"
+import Ideas from "./Ideas"
 
-const Contracts = () =>{
-    const { state, dispatch } = useContext(Store);
-    const { UserInfo } = state;
+const All_Contracts = () => {
+    const [contract_list, setContractList] = useState([])
+    const { state, dispatch } = useContext(Store)
+    const { UserInfo } = state
 
-    // React States
-    const [idea_data, setIdeaData] = useState('')
 
-    return(
+    const get_all_contract_list = async () => {
+        try {
+            const { data } = await api.get(`get_contract_by_id/${UserInfo.id}/`)
+            setContractList(data)
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+    useEffect(() => {
+        get_all_contract_list()
+    }, get_all_contract_list)
+
+
+    return (
         <>
-         <div className="row">
+            <div className="row">
                 <div className="col-12">
                     <div className="page-title-box d-sm-flex align-items-center justify-content-between">
-                        <h4 className="mb-sm-0 font-size-18">CONTRACTS</h4>
+                        <h4 className="mb-sm-0 font-size-18">ALL CONTRACTS</h4>
+
                     </div>
                 </div>
             </div>
@@ -22,20 +38,16 @@ const Contracts = () =>{
                 <div className="col-lg-12">
                     <div className="card">
                         <div className="card-body">
-                        
+
                             <div className="table-responsive">
-                                {idea_data ?
+                                {contract_list.length > 0 ?
                                     <>
                                         <table className="table align-middle table-nowrap mb-0">
                                             <thead className="table-light">
                                                 <tr>
-
                                                     <th className="align-middle">ID</th>
                                                     <th className="align-middle">IDEA</th>
-                                                    <th className="align-middle">DESCRIPTIONS</th>
-                                                    <th className="align-middle">REQ AMOUNT</th>
-                                                    <th className="align-middle">TERMS & CONDITIONS</th>
-                                                    <th className="align-middle">FILE</th>
+                                                    <th className="align-middle">IDEA TITLE</th>
                                                     <th className="align-middle">ACTIONS</th>
                                                 </tr>
                                             </thead>
@@ -43,7 +55,7 @@ const Contracts = () =>{
 
 
                                                 {
-                                                    idea_data.map((object) => (
+                                                    contract_list.map((object) => (
                                                         <tr>
 
                                                             <td>
@@ -51,23 +63,16 @@ const Contracts = () =>{
                                                                     {object.id}
                                                                 </a>{" "}
                                                             </td>
-                                                            <td>{object.idea}</td>
-                                                            <td>{object.description}</td>
-                                                            <td>{object.req_amount}</td>
+                                                            <td>{object.idea.idea}</td>
+                                                            <td>{object.idea_title}</td>
                                                             <td>
-                                                                {object.terms_conditions}
-                                                            </td>
-                                                            <td>
-                                                                {object.file}
-                                                            </td>
-                                                            <td>
-                                                                <Link
-                                                                to={`/admin/add/contracts/${object.id}`}
+                                                            <Link
+                                                                    to={`/admin/contract/tracking?data=${encodeURIComponent(JSON.stringify(object))}`}
                                                                     className="btn btn-primary btn-sm btn-rounded waves-effect waves-light"
-                                                                
                                                                 >
-                                                                    Make Contracts
+                                                                    TRACKING
                                                                 </Link>
+
                                                             </td>
                                                         </tr>
                                                     ))
@@ -78,10 +83,11 @@ const Contracts = () =>{
                                             </tbody>
                                         </table>
                                     </>
+
                                     :
-                                    <div className="text-center bolder">
+                                    <div className="text-center">
                                         <span className="text-danger bolder"> <b>No Contract Data Available</b></span>
-                                        </div>
+                                    </div>
                                 }
                             </div>
                             {/* end table-responsive */}
@@ -93,4 +99,4 @@ const Contracts = () =>{
     )
 }
 
-export  default Contracts
+export default All_Contracts

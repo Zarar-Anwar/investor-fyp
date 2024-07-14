@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import user_data, ideas, skill, contract
+from .models import user_data, ideas, skill, contract, tracking
 
 
 # Register your models here.
@@ -21,3 +21,9 @@ class ideas_admin(admin.ModelAdmin):
 @admin.register(contract)
 class contract_admin(admin.ModelAdmin):
     list_display = ('idea', 'idea_title')
+
+
+@admin.register(tracking)
+class TrackingAdmin(admin.ModelAdmin):
+    list_display = ['id', 'contract', 'product_name', 'progress', 'cost_description', 'cost', 'start_time', 'end_time',
+                    'status']

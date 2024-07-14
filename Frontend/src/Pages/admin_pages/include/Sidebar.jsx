@@ -10,6 +10,7 @@ const Sidebar = () => {
         localStorage.removeItem('UserInfo');
         dispatch({ type: 'ClearUserInfo', payload: null })
         navigate('/login');
+        window.location.reload()
     };
     return (
         <>
