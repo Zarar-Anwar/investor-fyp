@@ -18,7 +18,7 @@ const Main = () => {
                                         </div>
                                         <div className="flex-grow-1 align-self-center">
                                             <div className="text-muted">
-                                                <p className="mb-2">Welcome to {UserInfo.category} Dashboard</p>
+                                                <p className="mb-2">Welcome to   <b>{UserInfo.category.toUpperCase()}</b>  Dashboard</p>
                                                 <h5 className="mb-1">{UserInfo.name}</h5>
                                     
                                             </div>

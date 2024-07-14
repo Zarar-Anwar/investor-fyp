@@ -6,33 +6,32 @@ import { Store } from "../../Services/Store"
 import Ideas from "./Ideas"
 
 const Investor = () => {
-    const [user_list, serUserList] = useState()
-    const { state, dispatch } = useContext(Store)
-    const { UserInfo } = state
+    const [user_list, setUserList] = useState([]);
+    const { state } = useContext(Store);
+    const { UserInfo } = state;
 
     const handleDelete = async (id) => {
-
         try {
-            const data = await api.get(`/delete_user_by_id/${id}`)
-            toast.success("User Deleted")
+            await api.get(`/delete_user_by_id/${id}`);
+            toast.success("User Deleted");
+            setUserList(user_list.filter(user => user.id !== id));  // Update the state to remove the deleted user
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error.message);
         }
-
     }
 
     const get_all_user_list = async () => {
         try {
-            const { data } = await api.get(`get_all_users_investor/`)
-            serUserList(data)
+            const { data } = await api.get(`get_all_users_investor/`);
+            setUserList(data);
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error.message);
         }
     }
-    console.log(user_list)
+
     useEffect(() => {
-        get_all_user_list()
-    }, get_all_user_list)
+        get_all_user_list();
+    }, []);
 
 
     return (
@@ -51,7 +50,7 @@ const Investor = () => {
                         <div className="card-body">
 
                             <div className="table-responsive">
-                                {user_list ?
+                                {user_list.length > 0 ?
                                     <>
                                         <table className="table align-middle table-nowrap mb-0">
                                             <thead className="table-light">
@@ -111,7 +110,7 @@ const Investor = () => {
 
                                     :
                                     <div className="text-center">
-                                        <span className="text-danger bolder">No User Data Available</span>
+                                        <span className="text-danger bolder"> <b>No User Data Available</b></span>
                                     </div>
                                 }
                             </div>

@@ -6,15 +6,16 @@ import { Store } from "../../Services/Store"
 import Ideas from "./Ideas"
 
 const Skilled_Person = () => {
-    const [user_list, serUserList] = useState()
+    const [user_list, setUserList] = useState([])
     const { state, dispatch } = useContext(Store)
     const { UserInfo } = state
 
     const handleDelete = async (id) => {
 
         try {
-            const data = await api.get(`/delete_user_by_id/${id}`)
-            toast.success("User Deleted")
+            await api.get(`/delete_user_by_id/${id}`);
+            toast.success("User Deleted");
+            setUserList(user_list.filter(user => user.id !== id))
         } catch (error) {
             toast.error(error.message)
         }
@@ -24,7 +25,7 @@ const Skilled_Person = () => {
     const get_all_user_list = async () => {
         try {
             const { data } = await api.get(`get_all_users_skilled_person/`)
-            serUserList(data)
+            setUserList(data)
         } catch (error) {
             toast.error(error.message)
         }
@@ -51,7 +52,7 @@ const Skilled_Person = () => {
                         <div className="card-body">
 
                             <div className="table-responsive">
-                                {user_list ?
+                                {user_list.length > 0 ?
                                     <>
                                         <table className="table align-middle table-nowrap mb-0">
                                             <thead className="table-light">
@@ -111,8 +112,8 @@ const Skilled_Person = () => {
 
                                     :
                                     <div className="text-center">
-                                        <span className="text-danger bolder">No Ideas Data Available</span>
-                                    </div>
+                                        <span className="text-danger bolder"> <b>No User Data Available</b></span>
+                                        </div>
                                 }
                             </div>
                             {/* end table-responsive */}

@@ -42,7 +42,7 @@ const Main = ({ children, header }) => {
     //         `${process.env.PUBLIC_URL}/assets/libs/simplebar/simplebar.min.js`,
     //         `${process.env.PUBLIC_URL}/assets/libs/node-waves/waves.min.js`,
     //         `${process.env.PUBLIC_URL}/assets/libs/apexcharts/apexcharts.min.js`,
-    //         'assets/js/pages/dashboard.init.js',
+    //         // './assets/js/pages/dashboard.init.js',
     //         `${process.env.PUBLIC_URL}/assets/js/app.js`,
     //         `${process.env.PUBLIC_URL}/assets/core/libs/jquery/jquery.min.js`,
     //         `${process.env.PUBLIC_URL}/assets/core/libs/bootstrap/js/bootstrap.bundle.min.js`,
@@ -82,28 +82,28 @@ const Main = ({ children, header }) => {
     //     });
 
     //     // Cleanup function to remove all added link and script elements
-    //     return () => {
-    //         links.forEach(href => {
-    //             try {
-    //                 const link = document.querySelector(`link[href="${href.replace('%PUBLIC_URL%', process.env.PUBLIC_URL)}"]`);
-    //                 if (link && link.parentNode) {
-    //                     link.parentNode.removeChild(link);
-    //                 }
-    //             } catch (error) {
-    //                 console.error(`Failed to remove link: ${href}`, error);
-    //             }
-    //         });
-    //         scripts.forEach(src => {
-    //             try {
-    //                 const script = document.querySelector(`script[src="${src.replace('%PUBLIC_URL%', process.env.PUBLIC_URL)}"]`);
-    //                 if (script && script.parentNode) {
-    //                     script.parentNode.removeChild(script);
-    //                 }
-    //             } catch (error) {
-    //                 console.error(`Failed to remove script: ${src}`, error);
-    //             }
-    //         });
-    //     };
+    //     // return () => {
+    //     //     links.forEach(href => {
+    //     //         try {
+    //     //             const link = document.querySelector(`link[href="${href.replace('%PUBLIC_URL%', process.env.PUBLIC_URL)}"]`);
+    //     //             if (link && link.parentNode) {
+    //     //                 link.parentNode.removeChild(link);
+    //     //             }
+    //     //         } catch (error) {
+    //     //             console.error(`Failed to remove link: ${href}`, error);
+    //     //         }
+    //     //     });
+    //     //     scripts.forEach(src => {
+    //     //         try {
+    //     //             const script = document.querySelector(`script[src="${src.replace('%PUBLIC_URL%', process.env.PUBLIC_URL)}"]`);
+    //     //             if (script && script.parentNode) {
+    //     //                 script.parentNode.removeChild(script);
+    //     //             }
+    //     //         } catch (error) {
+    //     //             console.error(`Failed to remove script: ${src}`, error);
+    //     //         }
+    //     //     });
+    //     // };
     // }, [location.pathname]);
 
     return (

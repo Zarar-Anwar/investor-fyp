@@ -5,9 +5,9 @@ import { useContext, useEffect, useState } from "react"
 import { Store } from "../../Services/Store"
 
 const All_Ideas = () => {
-    const [idea_data, setIdeaData] = useState()
-    const {state , dispatch} = useContext(Store)
-    const {UserInfo} = state
+    const [idea_data, setIdeaData] = useState([])
+    const { state, dispatch } = useContext(Store)
+    const { UserInfo } = state
     const get_all_idea = async () => {
         try {
             const { data } = await api.get(`get_all_idea/`)
@@ -16,6 +16,20 @@ const All_Ideas = () => {
             toast.error(error.message)
         }
     }
+
+    
+    const handleDelete = async (id) => {
+
+        try {
+            await api.get(`/delete_idea_by_id/${id}`);
+            toast.success("Idea Deleted");
+            setIdeaData(idea_data.filter(idea => idea.id !== id))
+        } catch (error) {
+            toast.error(error.message)
+        }
+
+    }
+
 
     useEffect(() => {
         get_all_idea()
@@ -36,9 +50,9 @@ const All_Ideas = () => {
                 <div className="col-lg-12">
                     <div className="card">
                         <div className="card-body">
-                    
+
                             <div className="table-responsive">
-                                {idea_data ?
+                                {idea_data.length > 0 ?
                                     <>
                                         <table className="table align-middle table-nowrap mb-0">
                                             <thead className="table-light">
@@ -75,20 +89,20 @@ const All_Ideas = () => {
                                                                 {object.file}
                                                             </td>
                                                             <td>
+                                                                {!UserInfo.is_admin?
                                                                 <Link
-                                                                    to={`/admin/ideas/details?data=${encodeURIComponent(JSON.stringify(object))}`}
-                                                                    className="btn btn-primary btn-sm btn-rounded waves-effect waves-light"
+                                                                to={`/admin/ideas/details?data=${encodeURIComponent(JSON.stringify(object))}`}
+                                                                className="btn btn-primary btn-sm btn-rounded waves-effect waves-light"
                                                                 >
                                                                     View
-                                                                </Link>
-                                                                {UserInfo.is_admin?
-                                                                <Link
-                                                                to={`/admin/add/contracts/${object.id}`}
-                                                                className="btn btn-danger btn-sm btn-rounded waves-effect waves-light"
-                                                                
-                                                                >
-                                                                    DELETE
                                                                 </Link>:null
+                                                            }
+                                                                {UserInfo.is_admin ?
+                                                                    <button onClick={()=>{handleDelete(object.id)}}
+                                                                        className="btn btn-danger btn-sm btn-rounded waves-effect waves-light"
+                                                                    >
+                                                                        DELETE
+                                                                    </button> : null
                                                                 }
                                                             </td>
                                                         </tr>
@@ -103,7 +117,7 @@ const All_Ideas = () => {
 
                                     :
                                     <div className="text-center">
-                                        <span className="text-danger bolder">No Ideas Data Available</span>
+                                        <span className="text-danger bolder"> <b>No Idea Data Available</b></span>
                                     </div>
                                 }
                             </div>

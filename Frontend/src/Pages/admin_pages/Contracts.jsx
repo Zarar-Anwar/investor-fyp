@@ -78,11 +78,10 @@ const Contracts = () =>{
                                             </tbody>
                                         </table>
                                     </>
-
                                     :
                                     <div className="text-center bolder">
-                                        <span className="text-danger bolder">No Contracts Data Available</span>
-                                    </div>
+                                        <span className="text-danger bolder"> <b>No Contract Data Available</b></span>
+                                        </div>
                                 }
                             </div>
                             {/* end table-responsive */}

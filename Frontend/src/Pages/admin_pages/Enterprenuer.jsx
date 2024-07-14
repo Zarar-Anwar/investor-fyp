@@ -6,15 +6,16 @@ import { Store } from "../../Services/Store"
 import Ideas from "./Ideas"
 
 const Enterprenuer = () => {
-    const [user_list,serUserList] = useState()
-    const {state , dispatch} = useContext(Store)
-    const {UserInfo} = state
+    const [user_list, setUserList] = useState([])
+    const { state, dispatch } = useContext(Store)
+    const { UserInfo } = state
 
-    const handleDelete=async(id)=>{
+    const handleDelete = async (id) => {
 
         try {
-            const data = await api.get(`/delete_user_by_id/${id}`)
-            toast.success("User Deleted")
+            await api.get(`/delete_user_by_id/${id}`);
+            toast.success("User Deleted");
+            setUserList(user_list.filter(user => user.id !== id))
         } catch (error) {
             toast.error(error.message)
         }
@@ -25,15 +26,17 @@ const Enterprenuer = () => {
     const get_all_user_list = async () => {
         try {
             const { data } = await api.get(`get_all_users_enterprenuer/`)
-           serUserList(data)
+            setUserList(data)
         } catch (error) {
             toast.error(error.message)
         }
     }
-console.log(user_list)
+    console.log(user_list)
     useEffect(() => {
         get_all_user_list()
     }, get_all_user_list)
+
+    console.log(user_list)
 
 
     return (
@@ -50,9 +53,9 @@ console.log(user_list)
                 <div className="col-lg-12">
                     <div className="card">
                         <div className="card-body">
-                        
+
                             <div className="table-responsive">
-                                {user_list ?
+                                {user_list.length > 0 ?
                                     <>
                                         <table className="table align-middle table-nowrap mb-0">
                                             <thead className="table-light">
@@ -89,16 +92,16 @@ console.log(user_list)
                                                             <td>{object.gender}</td>
                                                             <td>{object.address}</td>
                                                             <td>{object.description}</td>
-                                                          
+
                                                             <td>
                                                                 <button
 
-                                                                    onClick={()=>{handleDelete(object.user)}}
+                                                                    onClick={() => { handleDelete(object.user) }}
                                                                     className="btn btn-danger btn-sm btn-rounded waves-effect waves-light"
                                                                 >
                                                                     DELETE
                                                                 </button>
-                                                               
+
                                                             </td>
                                                         </tr>
                                                     ))
@@ -111,7 +114,7 @@ console.log(user_list)
                                     </>
                                     :
                                     <div className="text-center">
-                                        <span className="text-danger bolder">No User Data Available</span>
+                                        <span className="text-danger bolder"> <b>No User Data Available</b></span>
                                     </div>
                                 }
                             </div>

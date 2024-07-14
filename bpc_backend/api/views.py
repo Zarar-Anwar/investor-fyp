@@ -207,6 +207,16 @@ def idea(request, id=None):
 
 
 @api_view(['GET'])
+def delete_idea_by_id(request, id):
+    try:
+        idea = ideas.objects.get(id=id)
+        idea.delete()
+        return Response({"message": "Idea deleted successfully"}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"error": "Idea not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
 def single_idea(request, id):
     if request.method == 'GET':
         idea = ideas.objects.get(id=id)
@@ -375,6 +385,16 @@ def single_gig(request, id):
         return Response(serialized.data, status=status.HTTP_200_OK)
     else:
         return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def delete_gig_by_id(request, id):
+    try:
+        gig = skill.objects.get(id=id)
+        gig.delete()
+        return Response({"message": "Gig deleted successfully"}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"error": "Gig not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])

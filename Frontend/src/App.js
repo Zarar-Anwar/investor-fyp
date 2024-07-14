@@ -25,6 +25,7 @@ import Enterprenuer from './Pages/admin_pages/Enterprenuer';
 import Investor from './Pages/admin_pages/Investor';
 import Skilled_Person from './Pages/admin_pages/Skilled_users';
 import All_Contracts from './Pages/admin_pages/All_Contract';
+import Edit_Gigs from './Pages/admin_pages/Edit_Gig';
 function App() {
   return (
     <>
@@ -64,6 +65,7 @@ function App() {
           <Route path='/admin/skilled_person' element={<Dashboard><SkilledPerson /></Dashboard>} />
           <Route path='/admin/gigs' element={<Dashboard><Gigs /></Dashboard>} />
           <Route path='/admin/add/gigs' element={<Dashboard><Add_Gigs /></Dashboard>} />
+          <Route path='/admin/edit/gig' element={<Dashboard><Edit_Gigs /></Dashboard>} />
 
 
           {/* CONTRACTOR */}

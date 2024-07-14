@@ -28,7 +28,7 @@ const Sidebar = () => {
                                     <div className="simplebar-content" style={{ padding: 0 }}>
                                         {/*- Sidemenu */}
                                         <div id="sidebar-menu" className="mm-active">
-
+                                        <p className="mb-2 ml-4"><b>{UserInfo.category.toUpperCase()} DASHBOARD</b></p>
                                             {/* {UserInfo.category == "skilled_person" ? */}
                                             {UserInfo.category == "skilled" ?
                                                 <ul className="metismenu list-unstyled mm-show" id="side-menu">

@@ -6,11 +6,11 @@ import { Store } from "../../Services/Store"
 import Ideas from "./Ideas"
 
 const All_Contracts = () => {
-    const [user_list, serUserList] = useState()
+    const [user_list, serUserList] = useState([])
     const { state, dispatch } = useContext(Store)
     const { UserInfo } = state
 
-    
+
     const get_all_user_list = async () => {
         try {
             const { data } = await api.get(`get_all_contracts/`)
@@ -41,7 +41,7 @@ const All_Contracts = () => {
                         <div className="card-body">
 
                             <div className="table-responsive">
-                                {user_list ?
+                                {user_list.length > 0 ?
                                     <>
                                         <table className="table align-middle table-nowrap mb-0">
                                             <thead className="table-light">
@@ -69,7 +69,7 @@ const All_Contracts = () => {
                                                             <td>
 
                                                                 <Link
-                                                                    to={`/delete_user_by_id/${object.user}`}
+                                                                    to={`   `}
                                                                     className="btn btn-primary btn-sm btn-rounded waves-effect waves-light"
                                                                 >
                                                                     TRACKING
@@ -88,7 +88,7 @@ const All_Contracts = () => {
 
                                     :
                                     <div className="text-center">
-                                        <span className="text-danger bolder">No User Data Available</span>
+                                        <span className="text-danger bolder"> <b>No Contract Data Available</b></span>
                                     </div>
                                 }
                             </div>
