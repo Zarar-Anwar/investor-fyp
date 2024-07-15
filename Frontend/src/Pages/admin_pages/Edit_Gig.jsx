@@ -28,15 +28,15 @@ const Edit_Gigs = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault();
-
+    
         const formData = new FormData();
         formData.append("user", UserInfo.id);
         formData.append("title", title);
         formData.append("description", description);
-        formData.append("file", file);
-
+        formData.append("file", file);  // Ensure this is a valid File object
+    
         try {
-            const { data } = await api.post(`post_gig/${UserInfo.id}/`, formData, {
+            const { data } = await api.patch(`post_gig/${object.id}/`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -44,8 +44,9 @@ const Edit_Gigs = () => {
             toast.success("Gig Updated");
             navigate("/admin/gigs");
         } catch (error) {
-            if (error.response && error.response.data && error.response.data.message) {
-                toast.error(error.response.data.message);
+            if (error.response && error.response.data) {
+                console.error('Error response data:', error.response.data);
+                toast.error(error.response.data.message || "An error occurred during Updating Gigs.");
             } else {
                 toast.error("An error occurred during Updating Gigs.");
             }
