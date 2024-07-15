@@ -354,29 +354,29 @@ def skills(request, id=None):
     if request.method == 'POST':
         data = request.data
         data['user'] = id
-        print('**************************')
-        print('**************************')
-        print('**************************')
-        print(data)
-        print('**************************')
-        print('**************************')
-        print('**************************')
+        print('Received data for POST:', data)
         gig_data = SkillSerializer(data=data)
         if gig_data.is_valid():
             gig_data.save()
-            return Response(gig_data.data, status=status.HTTP_200_OK)
+            return Response(gig_data.data, status=status.HTTP_201_CREATED)
         else:
+            print('Validation errors:', gig_data.errors)
             return Response(gig_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'PATCH':
+        try:
+            update_gig = skill.objects.get(id=id)
+        except skill.DoesNotExist:
+            return Response({"error": "Skill not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        update_gig = skill.objects.get(id=id)
         data = request.data.copy()
+        print('Received data for PATCH:', data)
         serialized_data = SkillSerializer(instance=update_gig, data=data, partial=True)
         if serialized_data.is_valid():
             serialized_data.save()
             return Response(serialized_data.data, status=status.HTTP_200_OK)
         else:
+            print('Validation errors:', serialized_data.errors)
             return Response(serialized_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -491,10 +491,8 @@ def get_tracking_by_id(request, id):
         try:
             # Retrieve the tracking records by contract_id
             tracking_instances = tracking.objects.filter(contract_id=id)
-
             # Serialize the instances
             serialized = TrackingSerializer(tracking_instances, many=True)
-
             return Response(serialized.data, status=status.HTTP_200_OK)
 
         except tracking.DoesNotExist:

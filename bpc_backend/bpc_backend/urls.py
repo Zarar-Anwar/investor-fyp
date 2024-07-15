@@ -45,7 +45,6 @@ urlpatterns = [
     path('get_all_gig/', views.skills),
     path('get_gig_by_id/<int:id>/', views.single_gig),
     path('delete_gig_by_id/<int:id>/', views.delete_gig_by_id),
-    path('update_gig/<int:id>/', views.skills),
     path('post_contract/', views.post_contract),
     path('creating_contract/', views.create_contract),
     path('get_contract_by_id/<int:id>/', views.get_contract_by_id),
