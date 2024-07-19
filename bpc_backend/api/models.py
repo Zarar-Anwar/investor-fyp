@@ -63,3 +63,22 @@ class tracking(models.Model):
 class pfp(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     pfp = models.ImageField(upload_to='pfp/')
+
+
+class HiredPerson(models.Model):
+    skilled_person = models.ForeignKey(skill, on_delete=models.CASCADE)
+    project = models.ForeignKey(tracking, on_delete=models.CASCADE)
+    hired_date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.skilled_person} hired for {self.project} on {self.hired_date}"
+
+
+class ProjectMaterial(models.Model):
+    project = models.ForeignKey(tracking, on_delete=models.CASCADE)
+    material_name = models.CharField(max_length=200)
+    material_cost = models.IntegerField()
+    buy_date = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return f"Material name is: {self.material_name}"

@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from .serializers import user_data_serializer, user_serializer, login_serializer, IdeasSerializer, ContractSerializer, \
-    SkillSerializer, TrackingSerializer, PfpSerializer
+    SkillSerializer, TrackingSerializer, PfpSerializer, ProjectMaterialSerializer, HiredPersonSerializer
 from django.contrib.auth.hashers import make_password
 from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
@@ -13,7 +13,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from rest_framework import status
 from django.contrib.auth import authenticate
-from .models import user_data, ideas, skill, contract, tracking, pfp
+from .models import user_data, ideas, skill, contract, tracking, pfp, ProjectMaterial, HiredPerson
 
 
 # Create your views here.
@@ -509,6 +509,39 @@ def post_tracking(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['GET'])
+def get_material_by_id(request, id):
+    if request.method == 'GET':
+        try:
+            # Retrieve the tracking records by contract_id
+            material_instances = ProjectMaterial.objects.filter(project_id=id)
+            # Serialize the instances
+            serialized = ProjectMaterialSerializer(material_instances, many=True)
+            return Response(serialized.data, status=status.HTTP_200_OK)
+
+        except tracking.DoesNotExist:
+            return Response({"error": "Tracking records not found."})
+
+    return Response({"error": "Method not allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+def get_skilled_person_by_id(request, id):
+    if request.method == 'GET':
+        try:
+            # Retrieve the tracking records by contract_id
+            skilled_person_instances = HiredPerson.objects.filter(project_id=id)
+            # Serialize the instances
+            serialized = HiredPersonSerializer(skilled_person_instances, many=True)
+            return Response(serialized.data, status=status.HTTP_200_OK)
+
+        except tracking.DoesNotExist:
+            return Response({"error": "Tracking records not found."})
+
+    return Response({"error": "Method not allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 # @api_view(['GET'])

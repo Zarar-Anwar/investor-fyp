@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import user_data, ideas, skill, contract, tracking, pfp
+from .models import user_data, ideas, skill, contract, tracking, pfp, HiredPerson, ProjectMaterial
 from django.contrib.auth.models import User
 
 
@@ -27,7 +27,7 @@ class IdeasSerializer(serializers.ModelSerializer):
 
 
 class SkillSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    user = user_serializer()
 
     class Meta:
         model = skill
@@ -59,3 +59,20 @@ class PfpSerializer(serializers.ModelSerializer):
     class Meta:
         model = pfp
         fields = ['user', 'pfp']
+
+
+class HiredPersonSerializer(serializers.ModelSerializer):
+    skilled_person = SkillSerializer()  # Use the nested serializer
+    project = TrackingSerializer()
+
+    class Meta:
+        model = HiredPerson
+        fields = ['id', 'skilled_person', 'project', 'hired_date']
+
+
+class ProjectMaterialSerializer(serializers.ModelSerializer):
+    project = TrackingSerializer()
+
+    class Meta:
+        model = ProjectMaterial
+        fields = ['id', 'project', 'material_name', 'material_cost', 'buy_date']

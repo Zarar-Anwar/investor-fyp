@@ -1,6 +1,8 @@
 import { useContext } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Store } from "../../../Services/Store"
+import logo from '../../../footer-logo.png'
+
 
 const Header = () => {
     const {state,dispatch} = useContext(Store)
@@ -21,12 +23,12 @@ const Header = () => {
                         <div className="navbar-brand-box">
                            
                             <Link to="/" className="logo logo-light">
-                                <span className="logo-sm">
-                                    <img src="assets/images/logo-light.svg" alt="" height={22} />
-                                </span>
+                                {/* <span className="logo-sm"> */}
+                                    <img src={logo} alt="img" height={20} />
+                                {/* </span>
                                 <span className="logo-lg">
-                                    <img src="assets/images/logo-light.png" alt="" height={19} />
-                                </span>
+                                    <img src="assets/images/logo-light.svg" alt="imh" height={19} />
+                                </span> */}
                            </Link>
                         </div>
                         <button

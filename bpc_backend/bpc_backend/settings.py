@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'bpc_backend.wsgi.application'
 #         'ENGINE': 'django.db.backends.mysql',
 #         'NAME':'bpc',
 #         'USER': 'root',
-#         'PASSWORD': 'admin',
+#         'PASSWORD': 'admin12',
 #         'HOST': '127.0.0.1',
 #         'PORT': '3306',
 #     }

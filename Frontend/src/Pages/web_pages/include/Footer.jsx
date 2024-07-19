@@ -52,7 +52,7 @@ const Footer = () => {
                         <div className="col-sm-6">
                             <div className="footer-widget mb-5">
                                 <div className="small-logo">
-                                    <img src="images/logo-footer.png" alt="" />
+                                    <img src="images/footer-logo.png" alt="" />
                                 </div>
                                 <p>
   Efficiently enable valuable resources and cost-effective solutions. 

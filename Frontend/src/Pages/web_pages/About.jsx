@@ -73,9 +73,9 @@ const About = () => {
                                 style={{ visibility: "visible" }}
                             >
                                 <div className="shadow-effect">
-                                    <img src="images/team2-1.jpg" alt="" />
+                                    <img src="images/haisam.jpg" alt="" />
                                     <div className="team-details">
-                                        <h3>DAVID MONREAL</h3>
+                                        <h3>HAISAM NADEEM</h3>
                                         <h6>CEO</h6>
                                         <p>
                                             Rapaciously seize adaptive infomediaries and user-centric
@@ -110,10 +110,10 @@ const About = () => {
                                 style={{ visibility: "visible" }}
                             >
                                 <div className="shadow-effect">
-                                    <img src="images/team2-2.jpg" alt="" />
+                                    <img src="images/muzammil.jpg" alt="" />
                                     <div className="team-details">
-                                        <h3>ANGELA FERNANDEZ</h3>
-                                        <h6>STRATEGY</h6>
+                                        <h3>MUZAMMIL TARIQ</h3>
+                                        <h6>CEO</h6>
                                         <p>
                                             Rapaciously seize adaptive infomediaries and user-centric
                                             intellectual capital. Collaboratively unleash market-driven.
@@ -147,10 +147,10 @@ const About = () => {
                                 style={{ visibility: "visible" }}
                             >
                                 <div className="shadow-effect">
-                                    <img src="images/team2-3.jpg" alt="" />
+                                    <img src="images/sara.png" alt="" />
                                     <div className="team-details">
-                                        <h3>MATIAS VALERO</h3>
-                                        <h6>GENERAL COUNSEL</h6>
+                                        <h3>SARA IFTIKHAR</h3>
+                                        <h6>CEO</h6>
                                         <p>
                                             Rapaciously seize adaptive infomediaries and user-centric
                                             intellectual capital. Collaboratively unleash market-driven.

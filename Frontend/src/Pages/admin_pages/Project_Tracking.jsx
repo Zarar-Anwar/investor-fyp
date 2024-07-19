@@ -3,11 +3,14 @@ import { Link, useLocation } from "react-router-dom";
 import { Store } from "../../Services/Store";
 import { toast } from "react-toastify";
 import api from "../../Services/Axios";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const ProjectTracking = () => {
     const { state } = useContext(Store);
     const { UserInfo } = state;
     const [trackings, setTrackings] = useState([]);
+    const [material, setMaterial] = useState([]);
+    const [skilled_person, setSkilledPerson] = useState([]);
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const data = query.get('data');
@@ -24,13 +27,182 @@ const ProjectTracking = () => {
         }
     };
 
+    const get_all_material = async () => {
+        try {
+            const response = await api.get(`/get_material_by_id/${object.id}`);
+            setMaterial(response.data);
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
+    const get_all_skilled_person = async () => {
+        try {
+            const response = await api.get(`/get_skilled_person_by_id/${object.id}`);
+            setSkilledPerson(response.data);
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
+    console.log(skilled_person)
+    console.log(material)
+
     useEffect(() => {
         get_all_trackings();
+        get_all_material();
+        get_all_skilled_person();
+
     }, []);
+
+    const skilledPersonCount = skilled_person.length;
+
+    // Combine data for the chart
+    const chartData = [
+        {
+            name: 'Skilled Persons',
+            count: skilledPersonCount,
+        },
+        ...material.map((mat, index) => ({
+            name: mat.material_name || `Material ${index + 1}`,
+            count: mat.material_cost || 0,
+        })),
+    ];
 
     return (
         <div className="page-content">
             <div className="container-fluid">
+                <div className="row">
+                    <ResponsiveContainer width="100%" height={400}>
+                        <BarChart
+                            width={200}
+                            height={300}
+                            data={chartData}
+                            margin={{
+                                top: 20, right: 30, left: 20, bottom: 5,
+                            }}
+                        >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="count" fill="blue" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+
+
+                <div className="row">
+
+                    <div className="col-6">
+                        <div className="card">
+                            <div className="card-body">
+                                <h4 className="card-title">SKilled Persons</h4>
+                                <div className="table-responsive">
+
+                                    {skilled_person.length > 0 ?
+                                        <>
+
+                                            <table className="table table-editable table-nowrap align-middle table-edits">
+                                                <thead>
+                                                    <tr style={{ cursor: "pointer" }}>
+                                                        <th>ID</th>
+                                                        <th>Username</th>
+                                                        <th>Title</th>
+                                                        <th>Description</th>
+                                                        <th>Hired Date</th>
+                                                        {/* <th>Action</th> */}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {skilled_person.map((object) => (
+                                                        <tr data-id={1} style={{ cursor: "pointer" }}>
+                                                            <td data-field="id" style={{ width: 80 }}>
+                                                                {object.id}
+                                                            </td>
+                                                            <td data-field="name">{object.skilled_person.user.username}</td>
+                                                            <td data-field="age">{object.skilled_person.title}</td>
+                                                            <td data-field="gender">{object.skilled_person.description}</td>
+                                                            <td data-field="gender">{object.hired_date}</td>
+                                                            {/* <td style={{ width: 100 }}>
+                                                                <Link
+                                                                    className="btn btn-outline-danger btn-sm edit"
+                                                                    title="Edit"
+                                                                >
+                                                                    <i className="fas fa-trash" style={{ color: "red" }} />
+                                                                </Link>
+                                                            </td> */}
+                                                        </tr>
+                                                    ))}
+
+                                                </tbody>
+                                            </table>
+
+                                        </>
+                                        : <div className="col-12 text-center mt-4">
+                                            <span className="text-danger"><b>No Skilled Person Hired Yet</b></span>
+                                        </div>}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>{" "}
+
+
+                    <div className="col-6">
+                        <div className="card">
+                            <div className="card-body">
+                                <h4 className="card-title">Material</h4>
+                                <div className="table-responsive">
+                                    {material.length > 0 ?
+                                        <>
+
+                                            <table className="table table-editable table-nowrap align-middle table-edits">
+                                                <thead>
+                                                    <tr style={{ cursor: "pointer" }}>
+                                                        <th>ID</th>
+                                                        <th>MATERIAL NAME</th>
+                                                        <th>MATERIAL COST</th>
+                                                        <th>BUY DATE</th>
+                                                        {/* <th>ACTION</th> */}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {material.map((object) => (
+                                                        <tr data-id={object.id} style={{ cursor: "pointer" }}>
+                                                            <td data-field="id" style={{ width: 80 }}>
+                                                                {object.id}
+                                                            </td>
+                                                            <td data-field="name">{object.material_name}</td>
+                                                            <td data-field="age">{object.material_cost}</td>
+                                                            <td data-field="gender">{object.buy_date}</td>
+                                                            {/* <td style={{ width: 100 }}>
+                                                                <Link
+                                                                    className="btn btn-outline-danger btn-sm edit"
+                                                                    title="Edit"
+                                                                >
+                                                                    <i className="fas fa-trash" style={{ color: "red" }} />
+                                                                </Link>
+                                                            </td> */}
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </>
+                                        : <div className="col-12 text-center mt-4">
+                                            <span className="text-danger"><b>No Material Buy Yet</b></span>
+                                        </div>}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>{" "}
+
+
+                    {/* end col */}
+                </div>
+
                 {/* start page title */}
                 <div className="row">
                     <div className="col-12">
@@ -106,10 +278,10 @@ const ProjectTracking = () => {
                                                                 </div>
                                                             </div>
                                                         </blockquote>
-                                                      
+
                                                     </div>
                                                     <hr />
-                                                   
+
                                                 </div>
                                             </div>
                                         </div>

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import user_data, ideas, skill, contract, tracking
+from .models import user_data, ideas, skill, contract, tracking, ProjectMaterial, HiredPerson
 
 
 # Register your models here.
@@ -27,3 +27,13 @@ class contract_admin(admin.ModelAdmin):
 class TrackingAdmin(admin.ModelAdmin):
     list_display = ['id', 'contract', 'product_name', 'progress', 'cost_description', 'cost', 'start_time', 'end_time',
                     'status']
+
+
+@admin.register(ProjectMaterial)
+class ProjectMaterialAdmin(admin.ModelAdmin):
+    list_display = ['project', 'material_name', 'material_cost', 'buy_date']
+
+
+@admin.register(HiredPerson)
+class HiredPersonAdmin(admin.ModelAdmin):
+    list_display = ['skilled_person', 'project', 'hired_date']

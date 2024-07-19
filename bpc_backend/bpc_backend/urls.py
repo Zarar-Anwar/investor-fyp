@@ -49,6 +49,8 @@ urlpatterns = [
     path('creating_contract/', views.create_contract),
     path('get_contract_by_id/<int:id>/', views.get_contract_by_id),
     path('get_tracking_by_id/<int:id>/', views.get_tracking_by_id),
+    path('get_material_by_id/<int:id>/', views.get_material_by_id),
+    path('get_skilled_person_by_id/<int:id>/', views.get_skilled_person_by_id),
     path('post_tracking/', views.post_tracking),
 
     # path('inv_done_contracts/<int:id>/', views.inv_done_contracts),
